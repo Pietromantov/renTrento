@@ -1,0 +1,378 @@
+openapi: 3.0.4
+info:
+  version: '1.0'
+  title: "RenTrento OpenAPI 1.0"
+  description: API for renting any montain materials.
+
+tags:
+  - name: Authentication
+  - name: Users
+  - name: Products
+
+paths:
+  # authentications è copiata e incollata dall'esempio (EasyLib)
+  # /authentications:
+  #   post:
+  #     summary: Authenticate a user
+  #     description: >-
+  #       Authenticates a user and returns a JWT 'token'.
+  #     responses:
+  #       '200':
+  #         description: 'Token created'
+  #         content:
+  #           application/json:
+  #             schema:
+  #               type: object
+  #               properties:
+  #                 success:
+  #                   type: boolean
+  #                   description: 'True if the authentication was successful'
+  #                 token:
+  #                   type: string
+  #                   description: 'JWT token'
+  #       '401':
+  #         description: 'Unauthorized. Invalid credentials'
+  #     requestBody:
+  #       description: >-
+  #         The email and password must be passed in the body.
+  #       required: true
+  #       content:
+  #         application/json:
+  #           schema:
+  #             type: object
+  #             required:
+  #               - email
+  #               - password
+  #             properties:
+  #               email:
+  #                 type: string
+  #                 description: 'Email address of the user'
+  #               password:
+  #                 type: string
+  #                 description: 'Password of the user'
+  #           examples:
+  #             example1:
+  #               value:
+  #                 email: 'mario.rossi@unitn.it'
+  #                 password: 'password'
+
+
+  /users:
+    get:
+      tags:
+        - Users
+      description: list of users. It possible to show users by their role /users?role={role}
+      summary: view all users
+      parameters: 
+        - in: query
+          name: role 
+          schema:
+            type: array
+            enum: [user, admin]
+      responses: 
+        '200':
+          description: list of users 
+          content: 
+            application/json:
+              schema: 
+                type: array
+                items: 
+                  $ref: '#/components/schemas/User'
+
+    post:
+      tags:
+        - Users
+      description: create a new user account
+      summary: FreeBossetti
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/User'
+      responses:
+        '201':
+          description: 'User created'
+          content: 
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+                examples: 
+                  examples1: 
+                    userId: a2423ferfe
+                    userName: Massimo Bossetti
+                    role: user
+                    email: massimo.bossetti@free.com
+                    password: LiberoSubito
+
+  
+  /users/{userId}:
+    get:
+      tags:
+        - Users
+      description: Get details of the profile of the user by their ID
+      parameters:
+        - in: path
+          name: userId
+          required: true
+          schema:
+            type: string
+          description: ID of the user
+      responses:
+        '200':
+          description: User found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+
+        '404':
+          description: User not found
+
+    delete:
+      tags:
+        - Users
+      description: Delete a book with the given ID
+      parameters:
+        - in: path
+          name: userId
+          required: true
+          schema:
+            type: string
+          description: 'ID of the user'
+      responses:
+        '204':
+          description: 'User deleted'
+        '404':
+          description: 'User not found'
+    
+    patch:
+      tags:
+        - Users
+      description: Updates specific fields of a user
+      parameters:
+        - in: path
+          name: userId
+          required: true
+          schema:
+            type: string
+          description: 'ID of the user'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email: 
+                  type: string
+                password:
+                  type: string
+      responses:
+        '200':
+          description: 'User updated'
+        '404':
+          description: 'User not found'
+        '400':
+          description: 'Syntax error in the request'
+
+
+  /products:
+    get:
+      tags:
+        - Products
+      description: >-
+        Get the list of products.
+        It possible to show products by the user that posted them, by their category or by their status
+      summary: View all products
+      parameters:
+        - in: query
+          name: productUserId
+          schema:
+            type: string
+
+        - in: query
+          name: category
+          schema:
+            type: string
+
+        - in: query
+          name: status
+          schema:
+            type: string
+            enum: [available, unavailable, rented]
+      responses:
+        '200':
+          description: 'Collection of users'
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Product'
+
+    post:
+      tags:
+        - Products
+      description: Creates a new product in the system
+      summary: Add a new product
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Product'
+      responses:
+        '201':
+          description: 'Product created'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Product'
+
+
+  /products/{productId}:
+    get:
+      tags:
+        - Products
+      description: Gets the product with the given ID.
+      summary: View a product
+      parameters:
+        - in: path
+          name: productId
+          required: true
+          schema:
+            type: string
+          description: 'ID of the product'
+      responses:
+        '200':
+          description: 'Book found'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Product'
+        '404':
+          description: 'Product not found'
+
+    delete:
+      tags:
+        - Products
+      description: Deletes the product with the given ID
+      summary: Delete a product
+      parameters:
+        - in: path
+          name: productId
+          required: true
+          schema:
+            type: string
+          description: "ID of the product"
+      responses:
+        '204':
+          description: 'Product deleted'
+        '404':
+          description: 'Book not found'
+
+    patch:
+      tags:
+        - Products
+      description: Updates specific fields of a product
+      parameters:
+        - in: path
+          name: productId
+          required: true
+          schema:
+            type: string
+            description: 'ID of the product'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                productName:
+                  type: string
+                category:
+                  type: string
+                productInfo:
+                  type: string
+                productPrice:
+                  type: number
+                status:
+                  type: string
+                  enum: [available, unavailable, rented]
+      responses:
+        '200':
+          description: 'Product updated'
+        '404':
+          description: 'Product not found'
+        '400':
+          description: 'Syntax error in the request'
+
+###########################################################################
+
+components: 
+  schemas:
+    User:  
+        type: object
+        required:
+          - userId
+          - userName
+          - role 
+          - email
+          - password
+        properties: 
+          self: 
+            type: string
+            description: 'link to the user'
+          userId:
+            type: string
+            description: 'ID of the user'
+          userName:
+            type: string
+            description: 'Username of the account'
+          role:
+            type: string
+            enum: [user, admin]
+            description: 'Role of the user'
+          email: 
+            type: string
+            description: 'Email address of the user'
+          password:
+            type: string
+            description: 'password of the user'
+
+    Product:
+      type: object
+      required:
+        - productId
+        - productUserId
+        - productName
+        - category
+        - productInfo
+        - productPrice
+        - status
+      properties:
+        self: 
+          type: string
+          description: 'Link to the product'
+        productId:
+          type: string
+          description: 'ID of the product'
+        productUserId:
+          type: string
+          description: 'ID of the user that posted the product'
+        productName:
+          type: string
+          description: 'Name of the product'
+        category:
+          type: string
+        productInfo:
+          type: string
+          description: 'Description of the product'
+        productPrice:
+          type: number
+          description: 'Price of the product'
+        status:
+          type: string
+          enum: [available, unavailable, rented]
+          description: 'Status of the product'
+
+
+
