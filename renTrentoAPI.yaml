@@ -8,6 +8,7 @@ tags:
   - name: Authentication
   - name: Users
   - name: Products
+  - name: Rentals
 
 paths:
   # authentications è copiata e incollata dall'esempio (EasyLib)
@@ -61,8 +62,10 @@ paths:
     get:
       tags:
         - Users
-      description: list of users. It possible to show users by their role /users?role={role}
-      summary: view all users
+      description: 
+        Gets the list of users.
+        It possible to show users by their role /users?role={role}
+      summary: 'View all users'
       parameters: 
         - in: query
           name: role 
@@ -82,8 +85,8 @@ paths:
     post:
       tags:
         - Users
-      description: create a new user account
-      summary: FreeBossetti
+      description: Creates a new user account
+      summary: 'Add a new user'
       requestBody:
         content:
           application/json:
@@ -110,6 +113,7 @@ paths:
       tags:
         - Users
       description: Get details of the profile of the user by their ID
+      summary: 'View a user'
       parameters:
         - in: path
           name: userId
@@ -132,6 +136,7 @@ paths:
       tags:
         - Users
       description: Delete a book with the given ID
+      summary: 'Delete a user'
       parameters:
         - in: path
           name: userId
@@ -149,6 +154,7 @@ paths:
       tags:
         - Users
       description: Updates specific fields of a user
+      summary: 'Update a user'
       parameters:
         - in: path
           name: userId
@@ -169,17 +175,17 @@ paths:
       responses:
         '200':
           description: 'User updated'
+        '400':
+          description: 'Error in the request'
         '404':
           description: 'User not found'
-        '400':
-          description: 'Syntax error in the request'
-
+        
 
   /products:
     get:
       tags:
         - Products
-      description: >-
+      description:
         Get the list of products.
         It possible to show products by the user that posted them, by their category or by their status
       summary: View all products
@@ -188,12 +194,10 @@ paths:
           name: productUserId
           schema:
             type: string
-
         - in: query
           name: category
           schema:
             type: string
-
         - in: query
           name: status
           schema:
@@ -273,6 +277,7 @@ paths:
       tags:
         - Products
       description: Updates specific fields of a product
+      summary: 'Update a product'
       parameters:
         - in: path
           name: productId
@@ -300,10 +305,158 @@ paths:
       responses:
         '200':
           description: 'Product updated'
+        '400':
+          description: 'Error in the request'
         '404':
           description: 'Product not found'
+        
+
+  /rentals:
+    get:
+      tags:
+        - Rentals
+      description:
+        Get the list of rentals.
+        It is possible to show rentals by the product, the renter, the client, the start date, the end date or the status
+      summary: View all rentals
+      parameters:
+        - in: query
+          name: productId
+          schema:
+            type: string
+        - in: query
+          name: renterId
+          schema:
+            type: string
+        - in: query
+          name: clientId
+          schema:
+            type: string
+        - in: query
+          name: startDate
+          schema:
+            type: string
+            format: date-time
+        - in: query
+          name: endDate
+          schema:
+            type: string
+            format: date-time
+        - in: query
+          name: status
+          schema:
+            type: string
+            enum: [active,not_active,finished]
+      responses:
+        '200':
+          description: 'Collection of rentals'
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Rental'
+    
+    post:
+      tags:
+        - Rentals
+      description: Creates a new rental in the system
+      summary: Add a new rental
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Rental'
+      responses:
+        '201':
+          description: 'Rental created'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Rental'
+
+          
+  /rentals/{rentalId}:
+    get:
+      tags:
+        - Rentals
+      description: Gets the rental with the given ID.
+      summary: View a rental
+      parameters:
+        - in: path
+          name: rentalId
+          required: true
+          schema:
+            type: string
+          description: 'ID of the rental'
+      responses:
+        '200':
+          description: 'rental found'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Rental'
+        '404':
+          description: 'Rental not found'
+
+    delete:
+      tags:
+        - Rentals
+      description: Deletes the rental with the given ID
+      summary: Delete a rental
+      parameters:
+        - in: path
+          name: rentalId
+          required: true
+          schema:
+            type: string
+          description: "ID of the rental"
+      responses:
+        '204':
+          description: 'Rental deleted'
+        '404':
+          description: 'Rental not found'
+
+    patch:
+      tags:
+        - Rentals
+      description: Updates specific fields of a rental
+      summary: 'Update a rental'
+      parameters:
+        - in: path
+          name: rentalId
+          required: true
+          schema:
+            type: string
+            description: 'ID of the rental'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                startDate:
+                  type: string
+                  format: date-time
+                  description: 'Start date of the rental'
+                endDate:
+                  type: string
+                  format: date-time
+                  description: 'End date of the rental'
+                rentalPrice:
+                  type: number
+                  description: 'Price of the rental'
+                status:
+                  type: string
+                  enum: [active,not_active,finished]
+      responses:
+        '200':
+          description: 'Rental updated'
         '400':
-          description: 'Syntax error in the request'
+          description: 'Error in the request'
+        '404':
+          description: 'Rental not found'
+
 
 ###########################################################################
 
@@ -320,7 +473,7 @@ components:
         properties: 
           self: 
             type: string
-            description: 'link to the user'
+            description: 'Link to the user'
           userId:
             type: string
             description: 'ID of the user'
@@ -374,5 +527,47 @@ components:
           enum: [available, unavailable, rented]
           description: 'Status of the product'
 
+    Rental:
+      type: object
+      required: 
+        - rentalId
+        - productId
+        - renterId
+        - clientId
+        - beginDate
+        - endDate
+        - rentalPrice
+        - status
+      properties:
+        self:
+          type: string
+          description: 'Link to the user'
+        rentalId:
+          type: string
+          description: 'ID of the rental'
+        productId:
+          type: string
+          description: 'ID of the product'
+        renterId:
+          type: string
+          description: 'ID of the renter'
+        clientId:
+          type: string
+          description: 'ID of the client'
+        startDate:
+          type: string
+          format: date-time
+          description: 'Start date of the rental'
+        endDate:
+          type: string
+          format: date-time
+          description: 'End date of the rental'
+        rentalPrice:
+          type: number
+          description: 'Price of the rental'
+        status:
+          type: string
+          enum: [active,not_active,finished]
+          description: 'Tells if the rental is active, will be active in the future (not_active) or finished'
 
 
