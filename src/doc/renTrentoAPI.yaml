@@ -61,7 +61,7 @@ paths:
     get:
       tags:
         - Users
-      description: 
+      description: >-
         Gets the list of users.
         It possible to show users by their role /users?role={role}
       summary: 'View all users'
@@ -184,7 +184,7 @@ paths:
     get:
       tags:
         - Products
-      description:
+      description: >-
         Get the list of products.
         It possible to show products by the user that posted them, by their category or by their status
       summary: View all products
@@ -314,7 +314,7 @@ paths:
     get:
       tags:
         - Rentals
-      description:
+      description: >-
         Get the list of rentals.
         It is possible to show rentals by the product, the renter, the client, the start date, the end date or the status
       summary: View all rentals
@@ -533,7 +533,7 @@ components:
         - productId
         - renterId
         - clientId
-        - beginDate
+        - startDate
         - endDate
         - rentalPrice
         - status
