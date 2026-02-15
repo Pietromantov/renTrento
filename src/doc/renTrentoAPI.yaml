@@ -11,51 +11,50 @@ tags:
   - name: Rentals
 
 paths:
-  # authentications è copiata e incollata dall'esempio (EasyLib)
-  # /authentications:
-  #   post:
-  #     summary: Authenticate a user
-  #     description: >-
-  #       Authenticates a user and returns a JWT 'token'.
-  #     responses:
-  #       '200':
-  #         description: 'Token created'
-  #         content:
-  #           application/json:
-  #             schema:
-  #               type: object
-  #               properties:
-  #                 success:
-  #                   type: boolean
-  #                   description: 'True if the authentication was successful'
-  #                 token:
-  #                   type: string
-  #                   description: 'JWT token'
-  #       '401':
-  #         description: 'Unauthorized. Invalid credentials'
-  #     requestBody:
-  #       description: >-
-  #         The email and password must be passed in the body.
-  #       required: true
-  #       content:
-  #         application/json:
-  #           schema:
-  #             type: object
-  #             required:
-  #               - email
-  #               - password
-  #             properties:
-  #               email:
-  #                 type: string
-  #                 description: 'Email address of the user'
-  #               password:
-  #                 type: string
-  #                 description: 'Password of the user'
-  #           examples:
-  #             example1:
-  #               value:
-  #                 email: 'mario.rossi@unitn.it'
-  #                 password: 'password'
+  /authentications:
+    post:
+      summary: Authenticate a user
+      description: >-
+        Authenticates a user and returns a JWT 'token'.
+      responses:
+        '200':
+          description: 'Token created'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    description: 'True if the authentication was successful'
+                  token:
+                    type: string
+                    description: 'JWT token'
+        '401':
+          description: 'Unauthorized. Invalid credentials'
+      requestBody:
+        description: >-
+          The email and password must be passed in the body.
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - email
+                - password
+              properties:
+                email:
+                  type: string
+                  description: 'Email address of the user'
+                password:
+                  type: string
+                  description: 'Password of the user'
+            examples:
+              example1:
+                value:
+                  email: 'mario.rossi@unitn.it'
+                  password: 'password'
 
 
   /users:
@@ -107,7 +106,7 @@ paths:
                     email: massimo.bossetti@free.com
                     password: LiberoSubito
 
-  
+
   /users/{userId}:
     get:
       tags:
