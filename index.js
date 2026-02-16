@@ -1,5 +1,6 @@
-import app from './app/app.js';
+import app from './src/app/app.js';
 import mongoose from 'mongoose';
+//import dotenv from 'dotenv';
 
 const port = process.env.PORT || 8080;
 
