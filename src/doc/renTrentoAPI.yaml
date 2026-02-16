@@ -9,6 +9,7 @@ tags:
   - name: Users
   - name: Products
   - name: Rentals
+  - name: Categories
 
 paths:
   /authentications:
@@ -457,6 +458,69 @@ paths:
           description: 'Rental not found'
 
 
+  /categories:
+    get:
+      tags:
+        - Categories
+      description: Get the list of the product categories
+      summary: View all categories
+      parameters:
+        - in: query
+          name: categoryId
+          schema:
+            type: string
+        - in: query
+          name: categoryName
+          schema:
+            type: string
+      responses:
+        '200':
+          description: 'Collection of categories'
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Category'
+
+    post:
+      tags:
+        - Categories
+      description: Creates a new product category in the system
+      summary: Add a new product category
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Category'
+      responses:
+        '201':
+          description: 'Category created'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Category'
+
+    
+  /categories/{categoryId}:
+    delete:
+      tags:
+        - Categories
+      description: Deletes the category with the given ID
+      summary: Delete a category
+      parameters:
+        - in: path
+          name: categoryId
+          required: true
+          schema:
+            type: string
+          description: 'ID of the category'
+      responses:
+        '204':
+          description: 'Category deleted'
+        '404':
+          description: 'Category not found'
+
 ###########################################################################
 
 components: 
@@ -540,7 +604,7 @@ components:
       properties:
         self:
           type: string
-          description: 'Link to the user'
+          description: 'Link to the rental'
         rentalId:
           type: string
           description: 'ID of the rental'
@@ -568,5 +632,21 @@ components:
           type: string
           enum: [active,not_active,finished]
           description: 'Tells if the rental is active, will be active in the future (not_active) or finished'
+
+    Category:
+      type: object
+      required:
+        - categoryId
+        - categoryName
+      properties:
+        self:
+          type: string
+          description: 'link to the category'
+        categoryId:
+          type: string
+          description: 'ID of the category'
+        categoryName:
+          type: string
+          description: 'Name of the category'
 
 
