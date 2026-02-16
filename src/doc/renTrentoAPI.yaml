@@ -4,6 +4,10 @@ info:
   title: "RenTrento OpenAPI 1.0"
   description: API for renting any montain materials.
 
+servers:
+  - url: http://localhost:8080/renTrentoAPI
+    description: Localhost
+
 tags:
   - name: Authentication
   - name: Users
@@ -62,16 +66,14 @@ paths:
     get:
       tags:
         - Users
-      description: >-
-        Gets the list of users.
-        It possible to show users by their role /users?role={role}
+      description: Gets the list of users.
       summary: 'View all users'
-      parameters: 
-        - in: query
-          name: role 
-          schema:
-            type: array
-            enum: [user, admin]
+      #parameters: 
+       # - in: query
+        #  name: role 
+         # schema:
+          #  type: array
+           # enum: [user, admin]
       responses: 
         '200':
           description: list of users 
@@ -528,7 +530,7 @@ components:
     User:  
         type: object
         required:
-          - userId
+          #- userId
           - userName
           - role 
           - email
@@ -537,9 +539,9 @@ components:
           self: 
             type: string
             description: 'Link to the user'
-          userId:
-            type: string
-            description: 'ID of the user'
+          #userId:
+           # type: string
+            #description: 'ID of the user'
           userName:
             type: string
             description: 'Username of the account'
@@ -557,7 +559,7 @@ components:
     Product:
       type: object
       required:
-        - productId
+        #- productId
         - productUserId
         - productName
         - category
@@ -568,9 +570,9 @@ components:
         self: 
           type: string
           description: 'Link to the product'
-        productId:
-          type: string
-          description: 'ID of the product'
+        #productId:
+         # type: string
+          #description: 'ID of the product'
         productUserId:
           type: string
           description: 'ID of the user that posted the product'
@@ -593,7 +595,7 @@ components:
     Rental:
       type: object
       required: 
-        - rentalId
+        #- rentalId
         - productId
         - renterId
         - clientId
@@ -605,9 +607,9 @@ components:
         self:
           type: string
           description: 'Link to the rental'
-        rentalId:
-          type: string
-          description: 'ID of the rental'
+        #rentalId:
+         # type: string
+          #description: 'ID of the rental'
         productId:
           type: string
           description: 'ID of the product'
@@ -636,15 +638,15 @@ components:
     Category:
       type: object
       required:
-        - categoryId
+        #- categoryId
         - categoryName
       properties:
         self:
           type: string
           description: 'link to the category'
-        categoryId:
-          type: string
-          description: 'ID of the category'
+        #categoryId:
+         # type: string
+          #description: 'ID of the category'
         categoryName:
           type: string
           description: 'Name of the category'
