@@ -4,7 +4,22 @@ import Rental from '../models/rental.js';
 const router = express.Router();
 
 router.get('', async function(req,res){
-    let rentals = await Rental.find().exec();
+    let filter = {}
+
+    if(req.query.productId)
+        filter.productId= req.query.productId;
+    if(req.query.renterId)
+        filter.renterId= req.query.renterId;
+    if(req.query.clientId)
+        filter.clientId= req.query.clientId;
+    if(req.query.startDate)
+        filter.startDate= req.query.startDate;
+    if(req.query.endDate)
+        filter.endDate= req.query.endDate;
+    if(req.query.status)
+        filter.status= req.query.status;
+
+    let rentals = await Rental.find(filter).exec();
 
     rentals= rentals.map(function(rental){
         return {

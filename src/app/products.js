@@ -4,7 +4,16 @@ import Product from '../models/product.js';
 const router = express.Router();
 
 router.get('', async function(req,res){
-    let products = await Product.find().exec();
+    let filter = {}
+
+    if(req.query.productUserId)
+        filter.productUserId= req.query.productUserId;
+    if(req.query.category)
+        filter.category= req.query.category;
+    if(req.query.status)
+        filter.status= req.query.status;
+
+    let products = await Product.find(filter).exec();
 
     products= products.map(function(product){
         return {
