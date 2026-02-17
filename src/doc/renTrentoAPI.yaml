@@ -101,14 +101,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/User'
-                examples: 
-                  examples1: 
-                    userId: a2423ferfe
-                    userName: Massimo Bossetti
-                    role: user
-                    email: massimo.bossetti@free.com
-                    password: LiberoSubito
-
 
   /users/{userId}:
     get:
@@ -174,6 +166,8 @@ paths:
                   type: string
                 password:
                   type: string
+                wallet:
+                  type: number
       responses:
         '200':
           description: 'User updated'
@@ -293,6 +287,8 @@ paths:
             schema:
               type: object
               properties:
+                productUserName:
+                  type: string
                 productName:
                   type: string
                 category:
@@ -535,6 +531,7 @@ components:
           - role 
           - email
           - password
+          - wallet
         properties: 
           self: 
             type: string
@@ -555,12 +552,16 @@ components:
           password:
             type: string
             description: 'password of the user'
+          wallet:
+            type: number
+            description: 'wallet of the user'
 
     Product:
       type: object
       required:
         #- productId
         - productUserId
+        - productUserName
         - productName
         - category
         - productInfo
@@ -576,6 +577,9 @@ components:
         productUserId:
           type: string
           description: 'ID of the user that posted the product'
+        productUserName:
+          type: string
+          description: 'Name of the user that posted the product'
         productName:
           type: string
           description: 'Name of the product'

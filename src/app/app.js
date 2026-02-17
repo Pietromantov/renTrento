@@ -5,7 +5,7 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import users from './users.js';
 import products from './products.js';
-//import rentals from './rentals.js';
+import rentals from './rentals.js';
 import categories from './categories.js';
 
 //import { readFileSync } from 'fs';
@@ -37,7 +37,7 @@ app.use((req,res,next) => {
 //routing risorse
 app.use('/renTrentoAPI/users',users);
 app.use('/renTrentoAPI/products',products);
-//app.use('/renTrentoAPI/rentals',rentals);
+app.use('/renTrentoAPI/rentals',rentals);
 app.use('/renTrentoAPI/categories',categories);
 
 // Default 404 handler

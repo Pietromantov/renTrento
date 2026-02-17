@@ -24,7 +24,8 @@ router.post('', async function(req,res){
         userName: req.body.userName,
         role: req.body.role,
         email: req.body.email,
-        password: req.body.password
+        password: req.body.password,
+        wallet: 0.0
     })
 
     if (!user.email || typeof user.email != 'string') {  //eventualmente aggiungere controllo sul formato
@@ -92,7 +93,9 @@ router.patch('/:userId', async function(req,res){
     if(req.body.email)
         user.email= req.body.email;
     if(req.body.password)
-        user.password= req.body.password
+        user.password= req.body.password;
+    if(req.body.wallet)
+        user.wallet= req.body.wallet;
 
     await user.save();
     

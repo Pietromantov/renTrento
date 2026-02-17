@@ -8,5 +8,6 @@ export default mongoose.model('User', new Schema({
         enum: ['user', 'admin']
     }, 
     email: String,
-    password: String
+    password: String,
+    wallet: Number
 }));

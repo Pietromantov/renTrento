@@ -10,6 +10,6 @@ export default mongoose.model('Rental', new Schema({
     rentalPrice: Number,
     status: {
         type: String,
-        enum: [active,not_active,finished]
+        enum: ['active','not_active','finished']
     }
 }));

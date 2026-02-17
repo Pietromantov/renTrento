@@ -9,7 +9,8 @@ router.get('', async function(req,res){
     products= products.map(function(product){
         return {
             self: 'renTrentoAPI/products' + product.id,
-            productUserId: product.productUserId, //cambiare in productUserId anche in models e API
+            productUserId: product.productUserId,
+            productUserName: product.productUserName,
             productName: product.productName,
             category: product.category,
             productPrice: product.productPrice,
@@ -22,7 +23,8 @@ router.get('', async function(req,res){
 
 router.post('', async function(req,res){
     let product= new Product({
-        productUserId: req.body.productUserId, //cambiare in productUserId anche in models e API
+        productUserId: req.body.productUserId,
+        productUserName: req.body.productUserName,
         productName: req.body.productName,
         category: req.body.category,
         productInfo: req.body.productInfo,
@@ -57,7 +59,7 @@ router.get('/:productId', async function(req,res){
     }
     product= {
         self: 'renTrentoAPI/products' + product.id,
-        productUserId: product.productUserId, //cambiare in productUserId anche in models e API
+        productUserName: product.productUserName,
         productName: product.productName,
         category: product.category,
         productInfo: product.productInfo,
