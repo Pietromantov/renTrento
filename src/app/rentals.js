@@ -1,5 +1,7 @@
 import express from 'express';
 import Rental from '../models/rental.js';
+import User from '../models/user.js';
+import Product from '../models/product.js';
 import tokenChecker from './tokenChecker.js';
 
 const router = express.Router();
@@ -43,6 +45,38 @@ router.get('', tokenChecker, async function(req,res){
 })
 
 router.post('', async function(req,res){
+    let rentalChecker= await Rental.findOne({
+        productId: req.body.productId,
+        renterId: req.body.renterId,
+        clientId: req.body.clientId,
+        startDate: req.body.startDate,
+        endDate: req.body.endDate,
+        rentalPrice: req.body.rentalPrice,
+        status: req.body.status}).exec();
+    
+    if(rentalChecker){
+        res.status(400).json({error: 'This rental already exists'});
+        return;
+    }
+    
+    let productIdChecker= await Product.findOne({productId: req.body.productId}).exec();
+    if(!productIdChecker){
+        res.status(400).json({error: 'Incorrect product ID'});
+        return;
+    }
+
+    let renterIdChecker= await User.findOne({userId: req.body.renterId}).exec();
+    if(!renterIdChecker){
+        res.status(400).json({error: 'Incorrect renter ID'});
+        return;
+    }
+
+    let clientIdChecker= await User.findOne({userId: req.body.clientId}).exec();
+    if(!clientIdChecker){
+        res.status(400).json({error: 'Incorrect client ID'});
+        return;
+    }
+
     let rental= new Rental({
         productId: req.body.productId,
         renterId: req.body.renterId,

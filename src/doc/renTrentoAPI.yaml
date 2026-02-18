@@ -90,6 +90,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/User'
+        '400':
+          description: 'Invalid userName or email'
 
   /users/{userId}:
     get:
@@ -357,6 +359,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Rental'
+        '400':
+          description: 'Rental already exists or invalid productId, renterId, or clientId'
 
           
   /rentals/{rentalId}:
@@ -481,6 +485,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Category'
+        '400':
+          description: 'Category already exists'
 
     
   /categories/{categoryId}:
