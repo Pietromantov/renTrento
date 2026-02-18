@@ -54,8 +54,20 @@ router.post('', async function(req,res){
         wallet: 0.0
     })
 
-    if (!user.email || typeof user.email != 'string') {  //eventualmente aggiungere controllo sul formato
+    if (!user.email || typeof user.email != 'string' || !checkIfEmailInString(user.email)) {
         res.status(400).json({ error: 'Invalid email format' });
+        return;
+    }
+
+    let emailChecker= await User.findOne({email: req.body.email}).exec();
+    if(emailChecker){
+        res.status(400).json({error: 'An account with this email address already exists'});
+        return;
+    }
+
+    let userNameChecker= await User.findOne({userName: req.body.userName}).exec();
+    if(userNameChecker){
+        res.status(400).json({error: 'Username already existing'});
         return;
     }
 
@@ -138,5 +150,10 @@ router.patch('/:userId', tokenChecker, async function(req,res){
     
     res.status(200).send();
 })
+
+function checkIfEmailInString(text) {
+    var re = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+    return re.test(text);
+}
 
 export default router;
