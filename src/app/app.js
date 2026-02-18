@@ -7,8 +7,7 @@ import users from './users.js';
 import products from './products.js';
 import rentals from './rentals.js';
 import categories from './categories.js';
-
-//import { readFileSync } from 'fs';
+import authentication from './authentication.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -32,7 +31,8 @@ app.use((req,res,next) => {
     next()
 })
 
-//aggiungere authentication routing
+//authentication routing
+app.use('/renTrentoAPI/authentication',authentication);
 
 //routing risorse
 app.use('/renTrentoAPI/users',users);

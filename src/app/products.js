@@ -1,5 +1,6 @@
 import express from 'express';
 import Product from '../models/product.js';
+import tokenChecker from './tokenChecker.js';
 
 const router = express.Router();
 
@@ -8,6 +9,8 @@ router.get('', async function(req,res){
 
     if(req.query.productUserId)
         filter.productUserId= req.query.productUserId;
+    if(req.query.productName)
+        filter.productName= {$regex: req.query.productName};
     if(req.query.category)
         filter.category= req.query.category;
     if(req.query.status)
@@ -30,7 +33,7 @@ router.get('', async function(req,res){
     res.status(200).json(products);
 })
 
-router.post('', async function(req,res){
+router.post('', tokenChecker, async function(req,res){
     let product= new Product({
         productUserId: req.body.productUserId,
         productUserName: req.body.productUserName,
@@ -42,30 +45,19 @@ router.post('', async function(req,res){
     })
 
     product = await product.save();
-    
-    //let productId = product._id;
 
     res.status(201).json(product);
 })
 
-/*router.use('/:productId', async function(req,res,next){
-    let product= await product.findById(req.params.productId).exec();
-    if(!product){
-        res.status(404).send()
-        console.log('product not found')
-        return;
-    }
-    req['product'] = product;
-    next();
-})*/
-
 router.get('/:productId', async function(req,res){
     let product= await Product.findById(req.params.productId).exec();
+    
     if(!product){
         res.status(404).send()
         console.log('product not found')
         return;
     }
+    
     product= {
         self: 'renTrentoAPI/products' + product.id,
         productUserName: product.productUserName,
@@ -79,25 +71,49 @@ router.get('/:productId', async function(req,res){
     res.status(200).json(product);
 })
 
-router.delete('/:productId', async function(req,res){
-    let product= await product.findById(req.params.productId).exec();
-    if(!product){
-        res.status(404).send()
-        console.log('product not found')
+router.delete('/:productId', tokenChecker, async function(req,res){
+    if(!req.loggedUser){
+        res.status(401).json({error: 'You are not authenticated'});
         return;
     }
+
+    let product= await Product.findById(req.params.productId).exec();
+
+    if(!product){
+        res.status(404).send();
+        console.log('product not found');
+        return;
+    }
+    
+    if(req.loggedUser.role!='admin' && req.loggedUser.id!=product.productUserId){
+        res.status(403).json({ error: 'Yuo are not allowed to do this' });
+        return;
+    }
+    
     await product.deleteOne({ _id: product.id});
-    console.log('product deleted')
-    res.status(204).send()
+    console.log('product deleted');
+    res.status(204).send();
 })
 
-router.patch('/:productId', async function(req,res){
-    let product= await product.findById(req.params.productId).exec();
-    /*if(!product){
-        res.status(404).send()
-        console.log('product not found')
+router.patch('/:productId', tokenChecker, async function(req,res){
+    if(!req.loggedUser){
+        res.status(401).json({error: 'You are not authenticated'});
         return;
-    }*/ 
+    }
+
+    let product= await Product.findById(req.params.productId).exec();
+
+    if(!product){
+        res.status(404).send();
+        console.log('product not found');
+        return;
+    }
+    
+    if(req.loggedUser.role!='admin' && req.loggedUser.id!=product.productUserId){
+        res.status(403).json({ error: 'Yuo are not allowed to do this' });
+        return;
+    }
+     
     if(req.body.productName)
         product.productName= req.body.productName;
     if(req.body.category)

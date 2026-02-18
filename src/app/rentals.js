@@ -1,9 +1,15 @@
 import express from 'express';
 import Rental from '../models/rental.js';
+import tokenChecker from './tokenChecker.js';
 
 const router = express.Router();
 
-router.get('', async function(req,res){
+router.get('', tokenChecker, async function(req,res){
+    if(!req.loggedUser){
+        res.status(401).json({error: 'You are not authenticated'});
+        return;
+    }
+    
     let filter = {}
 
     if(req.query.productId)
@@ -29,7 +35,6 @@ router.get('', async function(req,res){
             clientId: rental.clientId,
             startDate: rental.startDate,
             endDate: rental.endDate,
-            rentalPrice: rental.rentalPrice,
             status: rental.status
         }
     });
@@ -49,30 +54,29 @@ router.post('', async function(req,res){
     })
 
     rental = await rental.save();
-    
-    //let rentalId = rental._id;
 
     res.status(201).json(rental);
 })
 
-/*router.use('/:rentalId', async function(req,res,next){
-    let rental= await Rental.findById(req.params.rentalId).exec();
-    if(!rental){
-        res.status(404).send()
-        console.log('rental not found')
+router.get('/:rentalId', tokenChecker, async function(req,res){
+    if(!req.loggedUser){
+        res.status(401).json({error: 'You are not authenticated'});
         return;
     }
-    req['rental'] = rental;
-    next();
-})*/
 
-router.get('/:rentalId', async function(req,res){
     let rental= await Rental.findById(req.params.rentalId).exec();
+
     if(!rental){
         res.status(404).send()
         console.log('rental not found')
         return;
     }
+    
+    if(req.loggedUser.role!='admin' && req.loggedUser.id!=user.renterId && req.loggedUser.id!=user.clientId){
+        res.status(403).json({ error: 'Yuo are not allowed to do this' })
+        return;
+    }
+
     rental= {
         self: 'renTrentoAPI/rentals' + rental.id,
         productId: req.body.productId,
@@ -87,25 +91,49 @@ router.get('/:rentalId', async function(req,res){
     res.status(200).json(rental);
 })
 
-router.delete('/:rentalId', async function(req,res){
+router.delete('/:rentalId', tokenChecker, async function(req,res){
+    if(!req.loggedUser){
+        res.status(401).json({error: 'You are not authenticated'});
+        return;
+    }
+
     let rental= await Rental.findById(req.params.rentalId).exec();
+
     if(!rental){
         res.status(404).send()
         console.log('rental not found')
         return;
     }
+    
+    if(req.loggedUser.role!='admin' && req.loggedUser.id!=user.renterId && req.loggedUser.id!=user.clientId){
+        res.status(403).json({ error: 'Yuo are not allowed to do this' })
+        return;
+    }
+
     await rental.deleteOne({ _id: rental.id});
-    console.log('account deleted')
+    console.log('rental deleted')
     res.status(204).send()
 })
 
-router.patch('/:rentalId', async function(req,res){
+router.patch('/:rentalId', tokenChecker, async function(req,res){
+    if(!req.loggedUser){
+        res.status(401).json({error: 'You are not authenticated'});
+        return;
+    }
+
     let rental= await Rental.findById(req.params.rentalId).exec();
-    /*if(!rental){
+
+    if(!rental){
         res.status(404).send()
         console.log('rental not found')
         return;
-    }*/
+    }
+    
+    if(req.loggedUser.role!='admin' && req.loggedUser.id!=user.clientId){
+        res.status(403).json({ error: 'Yuo are not allowed to do this' })
+        return;
+    }
+    
     if(req.body.startDate)
         rental.startDate= req.body.startDate;
     if(req.body.endDate)    
