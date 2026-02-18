@@ -1,5 +1,6 @@
 import express from 'express';
 import Category from '../models/category.js';
+import tokenChecker from './tokenChecker.js';
 
 const router = express.Router();
 
@@ -16,14 +17,44 @@ router.get('', async function(req,res){
     res.status(200).json(categories);
 })
 
-router.post('', async function(req,res){
+router.post('', tokenChecker, async function(req,res){
+    if(!req.loggedUser){
+        res.status(401).json({error: 'You are not authenticated'});
+        return;
+    }
+    if(req.loggedUser.role!='admin'){
+        res.status(403).json({ error: 'Yuo are not allowed to do this' })
+        return;
+    }
+
     let category= new Category({categoryName: req.body.categoryName});
 
     category = await category.save();
     
-    //let categoryId = category._id;
-
     res.status(201).json(category);
+});
+
+router.delete('/:categoryId', tokenChecker, async function(req,res){
+    if(!req.loggedUser){
+        res.status(401).json({error: 'You are not authenticated'});
+        return;
+    }
+    if(req.loggedUser.role!='admin'){
+        res.status(403).json({ error: 'Yuo are not allowed to do this' })
+        return;
+    }
+
+    let category= await User.findById(req.params.categoryId).exec();
+
+    if(!category){
+        res.status(404).send()
+        console.log('category not found')
+        return;
+    }
+
+    await Category.deleteOne({ _id: category.id});
+    console.log('category deleted');
+    res.status(204).send();
 })
 
 export default router;

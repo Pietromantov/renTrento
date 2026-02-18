@@ -55,11 +55,6 @@ paths:
                 password:
                   type: string
                   description: 'Password of the user'
-            examples:
-              example1:
-                value:
-                  email: 'mario.rossi@unitn.it'
-                  password: 'password'
 
 
   /users:
@@ -68,12 +63,6 @@ paths:
         - Users
       description: Gets the list of users.
       summary: 'View all users'
-      #parameters: 
-       # - in: query
-        #  name: role 
-         # schema:
-          #  type: array
-           # enum: [user, admin]
       responses: 
         '200':
           description: list of users 
@@ -171,8 +160,6 @@ paths:
       responses:
         '200':
           description: 'User updated'
-        '400':
-          description: 'Error in the request'
         '404':
           description: 'User not found'
         
@@ -303,8 +290,6 @@ paths:
       responses:
         '200':
           description: 'Product updated'
-        '400':
-          description: 'Error in the request'
         '404':
           description: 'Product not found'
         
@@ -450,8 +435,6 @@ paths:
       responses:
         '200':
           description: 'Rental updated'
-        '400':
-          description: 'Error in the request'
         '404':
           description: 'Rental not found'
 
