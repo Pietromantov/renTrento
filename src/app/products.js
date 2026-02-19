@@ -41,6 +41,21 @@ router.post('', tokenChecker, async function(req,res){
         return;
     }
 
+    if(!req.body.productName || req.body.productName==''){
+        res.status(401).json({error: 'Product name required'});
+        return;
+    }
+
+    if(!req.body.productPrice){
+        res.status(401).json({error: 'Product price required'});
+        return;
+    }
+
+    if(!req.body.pickUpPoint){
+        res.status(401).json({error: 'Pick-up point required'});
+        return;
+    }
+
     let categoryChecker= await Category.findOne({categoryName: req.body.category});
 
     if(!categoryChecker){
@@ -56,7 +71,7 @@ router.post('', tokenChecker, async function(req,res){
         productInfo: req.body.productInfo,
         productPrice: req.body.productPrice,
         pickUpPoint: req.body.pickUpPoint,
-        status: req.body.status
+        status: 'available'
     })
 
     product = await product.save();

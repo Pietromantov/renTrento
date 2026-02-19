@@ -29,7 +29,7 @@ router.post('', tokenChecker, async function(req,res){
 
     let categoryNameChecker= await Category.findOne({categoryName: req.body.categoryName}).exec();
     if(categoryNameChecker){
-        res.status(400).json({error: 'This category still exists'});
+        res.status(400).json({error: 'This category already exists'});
         return;
     }
 

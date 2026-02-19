@@ -50,34 +50,59 @@ router.post('', tokenChecker, async function(req,res){
         return;
     }
 
-    let product= await Product.findbyId(req.body.productId).exec();
+    let product= await Product.findById(req.body.productId).exec();
+    
+    
     if(!product){
         res.status(400).json({error: 'Incorrect product ID'});
         return;
     }
 
-    let rentalChecker= await Rental.findOne({
-        productId: req.body.productId,
-        startDate: req.body.startDate,
-        endDate: req.body.endDate,
-        status: req.body.status}).exec();
+    if(product.productUserId==req.loggedUser.id){
+        res.status(400).json({error: 'This product is yours!'});
+        return;
+    }
     
-    if(rentalChecker){
-        res.status(400).json({error: 'This rental already exists'});
+    if((new Date(req.body.startDate))>=(new Date(req.body.endDate)) || (new Date(req.body.startDate))<(new Date())){
+        res.status(400).json({error: 'Invalid renting period'});
+        return;
+    }
+
+    let dateChecker= await Rental.findOne({
+        productId: req.body.productId,
+        startDate: {$gte: req.body.startDate, $lte: req.body.endDate},
+    }).exec();
+    
+    if(dateChecker){
+        res.status(400).json({error: 'Product already rented in the selected period'});
+        return;
+    }
+
+    let price= (new Date(req.body.endDate)-new Date(req.body.startDate))/(1000 * 60 * 60 * 24)*product.productPrice; //numero di giorni*prezzo al giorno
+    let renter= await User.findById(product.productUserId).exec();
+    let client= await User.findById(req.loggedUser.id).exec();
+
+    if(price>client.wallet){
+        res.status(400).json({error: 'Not enough money in wallet'});
         return;
     }
 
     let rental= new Rental({
-        productId: req.body.productId,
-        renterId: product.renterId,
-        clientId: req.loggedUser.clientId,
+        productId: product.id,
+        renterId: renter.id,
+        clientId: client.id,
         startDate: req.body.startDate,
         endDate: req.body.endDate,
-        rentalPrice: (req.body.endDate-req.body.startDate)/(1000 * 60 * 60 * 24)*product.productPrice, //numero di giorni*prezzo al giorno
+        rentalPrice: price,
         status: req.body.status
     })
 
+    renter.wallet+= price;
+    client.wallet-= price;
+
     rental = await rental.save();
+    renter = await renter.save();
+    client = await client.save();
 
     res.status(201).json(rental);
 })
@@ -153,28 +178,45 @@ router.patch('/:rentalId', tokenChecker, async function(req,res){
         return;
     }
     
-    if(req.loggedUser.role!='admin' && req.loggedUser.id!=rental.renterId && req.loggedUser.id!=rental.clientId){
+    if(req.loggedUser.id!=rental.renterId && req.loggedUser.id!=rental.clientId){
         res.status(403).json({ error: 'Yuo are not allowed to do this' })
         return;
     }
     
-    let product= await Product.findbyId(rental.productId).exec();
-    let newStartDate= rental.startDate;
-    let newEndDate= rental.endDate;
+    let product= await Product.findById(rental.productId).exec();
+    let renter= await User.findById(req.loggedUser.id).exec();
+    let client= await User.findById(product.productUserId).exec();
+    let newStartDate;
+    let newEndDate;
 
-    if(req.body.startDate){
+    if(req.body.startDate)
         newStartDate= req.body.startDate;
-        rental.startDate= req.body.startDate;
-    }
-    if(req.body.endDate){    
+    else
+        newStartDate= rental.startDate;
+    if(req.body.endDate)
         newEndDate= req.body.endDate;
-        rental.endDate= req.body.endDate;
+    else
+        newEndDate= rental.endDate;
+    
+    let newPrice= (new Date(newEndDate)-new Date(newStartDate))/(1000 * 60 * 60 * 24)*product.productPrice;
+    let diff= newPrice-rental.rentalPrice;
+    if(diff>client.wallet){
+        res.status(400).json({error: 'Not enough money in wallet'});
+        return;
     }
-    rental.rentalPrice= (newEndDate-newStartDate)/(1000 * 60 * 60 * 24)*product.productPrice;
+    
+    rental.startDate= newStartDate;
+    rental.endDate= newEndDate;
+    rental.rentalPrice= newPrice
     if(req.body.status)
         rental.status= req.body.status;
 
+    renter.wallet+= diff;
+    client.wallet-= diff;
+
     await rental.save();
+    await renter.save();
+    await client.save();
     
     res.status(200).send();
 })
