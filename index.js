@@ -1,3 +1,9 @@
+/*
+import dns from 'node:dns';
+// Forza l'uso dei server DNS di Google per risolvere i record SRV di MongoDB
+dns.setServers(['8.8.8.8', '8.8.4.4']);
+*/
+
 import app from './src/app/app.js';
 import mongoose from 'mongoose';
 //import dotenv from 'dotenv';

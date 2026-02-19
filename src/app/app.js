@@ -2,6 +2,7 @@ import express from 'express';
 import swaggerUi from 'swagger-ui-express';
 import yaml from 'yamljs';
 import path from 'path';
+import cors from 'cors';
 import { fileURLToPath } from 'url';
 import users from './users.js';
 import products from './products.js';
@@ -20,6 +21,8 @@ const app= express();
 
 //parser
 app.use(express.json());
+
+app.use(cors());
 
 //aggiungere frontend
 
