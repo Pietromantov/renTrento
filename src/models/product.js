@@ -8,6 +8,7 @@ export default mongoose.model('Product', new Schema({
     category: String, 
     productInfo: String,
     productPrice: Number,
+    pickUpPoint: String,
     status: {
         type: String,
         enum: ['available', 'unavailable', 'rented']

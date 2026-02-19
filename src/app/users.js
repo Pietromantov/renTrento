@@ -59,6 +59,19 @@ router.post('', async function(req,res){
         return;
     }
 
+    if(!user.role)
+        user.role= 'user';
+
+    if(!user.userName){
+        res.status(400).json({error: 'Username required'});
+        return;
+    }
+
+    if(!user.password){
+        res.status(400).json({error: 'Password required'});
+        return;
+    }
+
     let emailChecker= await User.findOne({email: req.body.email}).exec();
     if(emailChecker){
         res.status(400).json({error: 'An account with this email address already exists'});
@@ -135,12 +148,29 @@ router.patch('/:userId', tokenChecker, async function(req,res){
         return;
     }
     
-    if(req.body.userName)
+    if(req.body.userName){
+        let userNameChecker= await User.findOne({userName: req.body.userName}).exec();
+        if(userNameChecker){
+            res.status(400).json({error: 'Username already existing'});
+            return;
+        }
         user.userName= req.body.userName;
+    }
     if(req.body.role)    
         user.role= req.body.role;
-    if(req.body.email)
+    if(req.body.email){
+        if (typeof req.body.email != 'string' || !checkIfEmailInString(req.body.email)) {
+            res.status(400).json({ error: 'Invalid email format' });
+            return;
+        }
+
+        let emailChecker= await User.findOne({email: req.body.email}).exec();
+        if(emailChecker){
+            res.status(400).json({error: 'An account with this email address already exists'});
+            return;
+        }
         user.email= req.body.email;
+    }
     if(req.body.password)
         user.password= req.body.password;
     if(req.body.wallet)

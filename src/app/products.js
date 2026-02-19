@@ -1,5 +1,6 @@
 import express from 'express';
 import Product from '../models/product.js';
+import Category from '../models/category.js';
 import tokenChecker from './tokenChecker.js';
 
 const router = express.Router();
@@ -10,7 +11,7 @@ router.get('', async function(req,res){
     if(req.query.productUserId)
         filter.productUserId= req.query.productUserId;
     if(req.query.productName)
-        filter.productName= {$regex: req.query.productName};
+        filter.productName= {$regex: req.query.productName, $options: "i"};
     if(req.query.category)
         filter.category= req.query.category;
     if(req.query.status)
@@ -26,6 +27,7 @@ router.get('', async function(req,res){
             productName: product.productName,
             category: product.category,
             productPrice: product.productPrice,
+            pickUpPoint: product.pickUpPoint,
             status: product.status
         }
     });
@@ -34,13 +36,26 @@ router.get('', async function(req,res){
 })
 
 router.post('', tokenChecker, async function(req,res){
+    if(!req.loggedUser){
+        res.status(401).json({error: 'You are not authenticated'});
+        return;
+    }
+
+    let categoryChecker= await Category.findOne({categoryName: req.body.category});
+
+    if(!categoryChecker){
+        res.status(400).json({error: 'Invalid category'});
+        return;
+    }
+
     let product= new Product({
-        productUserId: req.body.productUserId,
-        productUserName: req.body.productUserName,
+        productUserId: req.loggedUser.id,
+        productUserName: req.loggedUser.userName,
         productName: req.body.productName,
         category: req.body.category,
         productInfo: req.body.productInfo,
         productPrice: req.body.productPrice,
+        pickUpPoint: req.body.pickUpPoint,
         status: req.body.status
     })
 
@@ -65,6 +80,7 @@ router.get('/:productId', async function(req,res){
         category: product.category,
         productInfo: product.productInfo,
         productPrice: product.productPrice,
+        pickUpPoint: product.pickUpPoint,
         status: product.status
     };
     
@@ -116,12 +132,20 @@ router.patch('/:productId', tokenChecker, async function(req,res){
      
     if(req.body.productName)
         product.productName= req.body.productName;
-    if(req.body.category)
-        product.category= req.body.category;    
+    if(req.body.category){
+        let categoryChecker= await Category.findOne({categoryName: req.body.category}).exec();
+        if(!categoryChecker){
+            res.status(400).json({error: 'Invalid category'});
+            return;
+        }
+        product.category= req.body.category;
+    }    
     if(req.body.productInfo)
         product.productInfo= req.body.productInfo;
     if(req.body.productPrice)
         product.productPrice= req.body.productPrice;
+    if(req.body.pickUpPoint)
+        product.pickUpPoint= req.body.pickUpPoint;
     if(req.body.status)
         product.status= req.body.status;
 

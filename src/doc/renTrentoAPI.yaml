@@ -215,6 +215,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Product'
+        '400':
+          description: 'Invalid parameters in the request'
 
 
   /products/{productId}:
@@ -286,6 +288,8 @@ paths:
                   type: string
                 productPrice:
                   type: number
+                pickUpPoint:
+                  type: string
                 status:
                   type: string
                   enum: [available, unavailable, rented]
@@ -548,21 +552,18 @@ components:
     Product:
       type: object
       required:
-        #- productId
         - productUserId
         - productUserName
         - productName
         - category
         - productInfo
         - productPrice
+        - pickUpPoint
         - status
       properties:
         self: 
           type: string
           description: 'Link to the product'
-        #productId:
-         # type: string
-          #description: 'ID of the product'
         productUserId:
           type: string
           description: 'ID of the user that posted the product'
@@ -574,12 +575,16 @@ components:
           description: 'Name of the product'
         category:
           type: string
+          description: 'name of the category of the product'
         productInfo:
           type: string
           description: 'Description of the product'
         productPrice:
           type: number
           description: 'Price of the product'
+        pickUpPoint:
+          type: string
+          description: 'Adress of the pick-up point of the product'
         status:
           type: string
           enum: [available, unavailable, rented]
@@ -588,7 +593,6 @@ components:
     Rental:
       type: object
       required: 
-        #- rentalId
         - productId
         - renterId
         - clientId
@@ -600,9 +604,6 @@ components:
         self:
           type: string
           description: 'Link to the rental'
-        #rentalId:
-         # type: string
-          #description: 'ID of the rental'
         productId:
           type: string
           description: 'ID of the product'
