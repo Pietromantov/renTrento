@@ -7,6 +7,8 @@ info:
 servers:
   - url: http://localhost:8080/renTrentoAPI
     description: Localhost
+  - url: https://rentrento.onrender.com/renTrentoAPI
+    description: render.com
 
 tags:
   - name: Authentication
