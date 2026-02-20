@@ -51,10 +51,11 @@ router.post('', tokenChecker, async function(req,res){
         return;
     }
 
+    /*
     if(!req.body.pickUpPoint){
         res.status(401).json({error: 'Pick-up point required'});
         return;
-    }
+    }*/
 
     let categoryChecker= await Category.findOne({categoryName: req.body.category});
 

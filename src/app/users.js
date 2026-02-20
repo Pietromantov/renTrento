@@ -28,7 +28,7 @@ router.get('', tokenChecker, async function(req,res){
         return;
     }
     if(req.loggedUser.role!='admin'){
-        res.status(403).json({error: 'Yuo are not allowed to do this' })
+        res.status(403).json({error: 'You are not allowed to do this' })
         return;
     }
     
@@ -120,7 +120,7 @@ router.delete('/:userId', tokenChecker, async function(req,res){
     }
     
     if(req.loggedUser.role!='admin' && req.loggedUser.id!=user.id){
-        res.status(403).json({ error: 'Yuo are not allowed to do this' })
+        res.status(403).json({ error: 'You are not allowed to do this' })
         return;
     }
 
@@ -144,7 +144,7 @@ router.patch('/:userId', tokenChecker, async function(req,res){
     }
     
     if(req.loggedUser.role!='admin' && req.loggedUser.id!=user.id){
-        res.status(403).json({ error: 'Yuo are not allowed to do this' })
+        res.status(403).json({ error: 'You are not allowed to do this' })
         return;
     }
     

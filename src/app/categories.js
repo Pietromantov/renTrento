@@ -9,7 +9,7 @@ router.get('', async function(req,res){
 
     categories= categories.map(function(category){
         return {
-            self: 'renTrentoAPI/categories' + category.id,
+            self: '/renTrentoAPI/categories/' + category.id,
             categoryName: category.categoryName,
         }
     });
@@ -18,12 +18,12 @@ router.get('', async function(req,res){
 })
 
 router.post('', tokenChecker, async function(req,res){
-    if(!req.loggedUser){
+    if(!req.loggedUser){ //Ridondande: esiste già il tokenChecker, mantenuto per sicurezza
         res.status(401).json({error: 'You are not authenticated'});
         return;
     }
     if(req.loggedUser.role!='admin'){
-        res.status(403).json({ error: 'Yuo are not allowed to do this' })
+        res.status(403).json({ error: 'You are not allowed to do this' })
         return;
     }
 
@@ -41,16 +41,16 @@ router.post('', tokenChecker, async function(req,res){
 });
 
 router.delete('/:categoryId', tokenChecker, async function(req,res){
-    if(!req.loggedUser){
+    if(!req.loggedUser){ //Ridondande: esiste già il tokenChecker, mantenuto per sicurezza
         res.status(401).json({error: 'You are not authenticated'});
         return;
     }
     if(req.loggedUser.role!='admin'){
-        res.status(403).json({ error: 'Yuo are not allowed to do this' })
+        res.status(403).json({ error: 'You are not allowed to do this' })
         return;
     }
 
-    let category= await User.findById(req.params.categoryId).exec();
+    let category= await Category.findById(req.params.categoryId).exec();
 
     if(!category){
         res.status(404).send()
