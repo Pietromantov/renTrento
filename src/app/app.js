@@ -24,8 +24,6 @@ app.use(express.json());
 
 app.use(cors());
 
-//aggiungere frontend
-
 //usa documento API
 app.use('/APIdocs', swaggerUi.serve, swaggerUi.setup(APIdoc));
 
